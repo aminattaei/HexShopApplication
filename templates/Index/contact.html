@@ -37,11 +37,14 @@
                         <h2>Say Hello. Don't Be Shy!</h2>
                         <span>Details to details is what makes Hexashop different from the other themes.</span>
                     </div>
+
                     <form id="contact" action="" method="post">
+                      {% csrf_token %}
+                      
                         <div class="row">
                           <div class="col-lg-6">
                             <fieldset>
-                              <input name="name" type="text" id="name" placeholder="Your name" required="">
+                              <input name="fullname" type="text" id="name" placeholder="Your fullname" required="">
                             </fieldset>
                           </div>
                           <div class="col-lg-6">
@@ -75,6 +78,7 @@
                         <h2>By Subscribing To Our Newsletter You Can Get 30% Off</h2>
                         <span>Details to details is what makes Hexashop different from the other themes.</span>
                     </div>
+
                     <form id="subscribe" action="" method="get">
                         <div class="row">
                           <div class="col-lg-5">

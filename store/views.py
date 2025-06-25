@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
+from django.http import HttpRequest
 from django.views import generic
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
 
-
-from .models import Product
+from .forms import ContactForm
+from .models import Product, Category, Contact, Customer, Order
 
 
 def Home_Page(request):
@@ -80,3 +81,40 @@ def login_user(request):
             return redirect("login")
     else:
         return render(request, "registration/login.html", {})
+
+
+def Contact_View(request):
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, "Your message to our team has been successfully saved."
+            )
+            return redirect("home_page")
+        else:
+            messages.error(
+                request,
+                "There was a problem sending the message. Please try again.",
+            )
+            return redirect("contact_page")
+
+    else:
+        form = ContactForm()
+
+    return render(request, "Index/contact.html", {"form": form})
+
+
+def Category_view(request, foo: str):
+    foo = foo.replace(" ", "-").lower()
+    print(foo   )
+    try:
+        category = Category.objects.get(name=foo)
+       
+        products = Product.objects.filter(category=category)
+        return render(
+            request, "Index/category.html", {"products": products, "category": category}
+        )
+    except:
+        messages.error(request, "This category does not exist... ")
+        return redirect("home_page")

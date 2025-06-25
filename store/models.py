@@ -7,7 +7,7 @@ from datetime import datetime
 class Category(models.Model):
     name = models.CharField(_("category name"), max_length=50)
 
-    description = models.TextField(_("category description"), default="", blank=True)
+    description = models.TextField(default="", blank=True,null=True)
 
     class Meta:
         verbose_name = _("category")
@@ -96,3 +96,19 @@ class Order(models.Model):
 
     def get_absolute_url(self):
         return reverse("Category_detail", kwargs={"pk": self.pk})
+
+
+class Contact(models.Model):
+    fullname = models.CharField(max_length=50)
+    email = models.EmailField(max_length=254)
+    message = models.TextField()
+
+    class Meta:
+        verbose_name = _("Contact")
+        verbose_name_plural = _("Contacts")
+
+    def __str__(self):
+        return self.fullname
+
+    def get_absolute_url(self):
+        return reverse("Contact_detail", kwargs={"pk": self.pk})
