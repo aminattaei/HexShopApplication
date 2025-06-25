@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} products {% endblock title %} 
+
+{% block content %}
+    <style>
+        #PictureImage{
+            width: 200px;
+            height: 200px;
+        }
+
+        .sale-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px; /* قبلاً left بود، حالا right شد */
+        background-color: red;
+        color: white;
+        padding: 6px 14px;
+        font-weight: bold;
+        font-size: 16px;
+        font-style: italic;
+        border-radius: 6px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        z-index: 10;
+        }
+    
+
+    </style>
+
+    <!-- ***** Main Banner Area Start ***** -->
+    <div class="page-heading" id="top">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="inner-content">
+                        <h2>Check Our Products</h2>
+                        <span>Awesome &amp; Creative HTML CSS layout by TemplateMo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Main Banner Area End ***** -->
+
+
+    <!-- ***** Products Area Starts ***** -->
+    <section class="section" id="products">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-heading">
+                        <h2>Our Latest Products</h2>
+                        <span>Check out all of our products.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+
+                {% for product in products %}
+                    {% if product.is_sale %}
+                        <div class="col-lg-4">
+                            <div class="item">
+                                <div class="thumb">
+                                    <div class="hover-content">
+                                        <ul>
+                                            <li><a href="{% static 'single-product.html' %}"><i class="fa fa-eye"></i></a></li>
+                                            <li><a href="{% static 'single-product.html' %}"><i class="fa fa-star"></i></a></li>
+                                            <li><a href="{% static 'single-product.html' %}"><i class="fa fa-shopping-cart"></i></a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="sale-badge">SALE!</div>
+                                    <img id="PictureImage" src="{{ product.image.url }}" alt="{{ product.name }}">
+                                </div>
+                                <div class="down-content">
+                                    <a href="{{ product.get_absolute_url }}"><h4>{{ product.name  }}</h4></a>
+                                    <del>$ {{ product.price }}</del>
+                                    &nbsp; <strong>$ {{ product.sale_price }}</strong>
+                                    <ul class="stars">
+
+                                        <li>{{ product.category }}</li>
+                                        
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    {% else %}
+
+                         <div class="col-lg-4">
+                            <div class="item">
+                                <div class="thumb">
+                                    <div class="hover-content">
+                                        <ul>
+                                            <li><a href="{% static 'single-product.html' %}"><i class="fa fa-eye"></i></a></li>
+                                            <li><a href="{% static 'single-product.html' %}"><i class="fa fa-star"></i></a></li>
+                                            <li><a href="{% static 'single-product.html' %}"><i class="fa fa-shopping-cart"></i></a></li>
+                                        </ul>
+                                    </div>
+                                    <img id="PictureImage" src="{{ product.image.url }}" alt="{{ product.name }}">
+                                </div>
+                                <div class="down-content">
+                                    <a href="{{ product.get_absolute_url }}"><h4>{{ product.name  }}</h4></a>
+                                    <span>${{ product.price }}</span>
+                                    <ul class="stars">
+
+                                        <li>{{ product.category }}</li>
+                                        
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                
+
+                
+
+            </div>
+        </div>
+    </section>
+    <!-- ***** Products Area Ends ***** -->
+    
+{% endblock content %}

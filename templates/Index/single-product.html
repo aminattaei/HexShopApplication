@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} {{ product.name }} {% endblock title %}
+
+{% block content %}
+
+    <style>
+
+        .sale-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px; /* قبلاً left بود، حالا right شد */
+        background-color: red;
+        color: white;
+        padding: 6px 14px;
+        font-weight: bold;
+        font-size: 16px;
+        font-style: italic;
+        border-radius: 6px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        z-index: 10;
+        }
+        
+    </style>
+
+    <!-- ***** Main Banner Area Start ***** -->
+    <div class="page-heading" id="top">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="inner-content">
+                        <h2>Details for {{ product.name  }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Main Banner Area End ***** -->
+
+
+    <!-- ***** Product Area Starts ***** -->
+    {% if product.is_sale %}
+
+            <section class="section" id="product">
+                <div class="container">
+                    
+                    
+                    
+                    <div class="row">
+                        <div class="col-lg-8">
+                        <div class="left-images">
+                            <div class="sale-badge">SALE!</div>
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="right-content">
+                            <h4>{{ product.name }}</h4>
+                            <del>{{ product.price }}</del> &nbsp; <span class="price">${{ product.sale_price }}</span>
+                            <ul class="stars">
+                                <li> {{ product.category }} </li>
+                            </ul>
+                            <span>{{ product.description }}</span>
+                            <div class="quote">
+                                <i class="fa fa-quote-left"></i><p>{{ product.description|slice:50 }}</p>
+                            </div>
+                            <div class="quantity-content">
+                                <div class="left-content">
+                                    <h6>No. of Orders</h6>
+                                </div>
+                                <div class="right-content">
+                                    <div class="quantity buttons_added">
+                                        <input type="button" value="-" class="minus"><input type="number" step="1" min="1" max="" name="quantity" value="1" title="Qty" class="input-text qty text" size="4" pattern="" inputmode=""><input type="button" value="+" class="plus">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="total">
+                                <h4>Total: $210.00</h4>
+                                <div class="main-border-button"><a href="#">Add To Cart</a></div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </section>
+
+        {% else %}
+             <section class="section" id="product">
+            <div class="container">
+                
+                
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                    <div class="left-images">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="right-content">
+                        <h4>{{ product.name }}</h4>
+                        <span class="price">${{ product.price }}</span>
+                        <ul class="stars">
+                            <li> {{ product.category }} </li>
+                        </ul>
+                        <span>{{ product.description }}</span>
+                        <div class="quote">
+                            <i class="fa fa-quote-left"></i><p>{{ product.description|slice:50 }}</p>
+                        </div>
+                        <div class="quantity-content">
+                            <div class="left-content">
+                                <h6>No. of Orders</h6>
+                            </div>
+                            <div class="right-content">
+                                <div class="quantity buttons_added">
+                                    <input type="button" value="-" class="minus"><input type="number" step="1" min="1" max="" name="quantity" value="1" title="Qty" class="input-text qty text" size="4" pattern="" inputmode=""><input type="button" value="+" class="plus">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="total">
+                            <h4>Total: $210.00</h4>
+                            <div class="main-border-button"><a href="#">Add To Cart</a></div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </section>
+        
+    {% endif %}
+    <!-- ***** Product Area Ends ***** -->
+    
+    <!-- ***** Footer Start ***** -->
+   
+{% endblock content %}
