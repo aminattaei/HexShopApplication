@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.text import slugify
 from django.urls import reverse
 from datetime import datetime
 
@@ -8,6 +9,7 @@ class Category(models.Model):
     name = models.CharField(_("category name"), max_length=50)
 
     description = models.TextField(default="", blank=True,null=True)
+    slug=models.SlugField(unique=True,max_length=255,blank=True)
 
     class Meta:
         verbose_name = _("category")

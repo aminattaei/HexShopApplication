@@ -1,17 +1,20 @@
 from django.shortcuts import render, redirect
-from django.http import HttpRequest
+from django.urls import reverse
 from django.views import generic
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 from .forms import ContactForm
-from .models import Product, Category, Contact, Customer, Order
+from .models import Product, Category
 
 
 def Home_Page(request):
     return render(request, "Index/index.html", {})
+
 
 
 def about_page(request):
@@ -83,6 +86,7 @@ def login_user(request):
         return render(request, "registration/login.html", {})
 
 
+
 def Contact_View(request):
     if request.method == "POST":
         form = ContactForm(request.POST)
@@ -105,6 +109,7 @@ def Contact_View(request):
     return render(request, "Index/contact.html", {"form": form})
 
 
+@login_required(login_url="/store/login/")
 def Category_view(request, foo: str):
     foo = foo.replace(" ", "-").lower()
     print(foo   )

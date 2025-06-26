@@ -13,7 +13,7 @@
         .sale-badge {
         position: absolute;
         top: 10px;
-        right: 10px; /* قبلاً left بود، حالا right شد */
+        right: 10px;
         background-color: red;
         color: white;
         padding: 6px 14px;
@@ -24,21 +24,28 @@
         box-shadow: 0 0 10px rgba(0,0,0,0.2);
         z-index: 10;
         }
-    
+        
+        .category-title {
+        text-align: center;
+        margin-top: 30px;
+        margin-bottom: 30px;
+        font-size: 2.5rem;
+        font-weight: bold;
+}
 
     </style>
+    
         <br>
         <br>
+        
+       
+        <h1 class="category-title">{{ category }}</h1>
         <br>
         <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
+        
         <div class="container">
             <div class="row">
-
+               
                 {% for product in products %}
                     {% if product.is_sale %}
                         <div class="col-lg-4">
