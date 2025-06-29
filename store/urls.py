@@ -12,4 +12,6 @@ urlpatterns = [
     path("login/", views.login_user, name="login"),
     path("logout/", views.logout_user, name="logout"),
     path("category/<str:foo>/", views.Category_view, name="category_page"),
+    path("add-to-cart/<int:pk>/", views.add_to_cart, name="add_to_cart"),
+    path('cart/',views.cart_summary,name='cart_summary')
 ]

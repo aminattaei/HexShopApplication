@@ -8,14 +8,21 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
+
 from .forms import ContactForm
-from .models import Product, Category
+from .models import Product, Category,Cart,CartItem,Customer
 
 
 def Home_Page(request):
-    return render(request, "Index/index.html", {})
+    MensCategory = Category.objects.get(name='men')
+    WomensCategory = Category.objects.get(name='women')
+    KidssCategory = Category.objects.get(name='kids')
 
+    mensProduct = Product.objects.filter(category=MensCategory)
+    womensProduct=Product.objects.filter(category=WomensCategory)
+    kidsProduct=Product.objects.filter(category=KidssCategory)
 
+    return render(request, "Index/index.html",{'mensProduct':mensProduct,'womensProduct':womensProduct,'kidsProduct':kidsProduct})
 
 def about_page(request):
     return render(request, "Index/about.html", {})
@@ -44,20 +51,15 @@ def register_view(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            Customer.objects.create(
+                first_name=user.username,
+                last_name="",
+                email=user.email,
+                password="",
+            )
             messages.success(request, "Your account was successfully created!")
             login(request, user)
             return redirect("home_page")
-        else:
-            messages.error(
-                request,
-                "The username or password is incorrect. Please try again or contact the support team.",
-            )
-            return redirect("register")
-
-    else:
-        form = UserCreationForm()
-
-    return render(request, "registration/signup.html", {"form": form})
 
 
 def logout_user(request):
@@ -74,7 +76,6 @@ def login_user(request):
         if user is not None:
             login(request, user)
             messages.success(request, "You have successfully logged in!")
-            print(messages.success)
             return redirect("home_page")
         else:
             messages.error(
@@ -84,7 +85,6 @@ def login_user(request):
             return redirect("login")
     else:
         return render(request, "registration/login.html", {})
-
 
 
 def Contact_View(request):
@@ -112,10 +112,9 @@ def Contact_View(request):
 @login_required(login_url="/store/login/")
 def Category_view(request, foo: str):
     foo = foo.replace(" ", "-").lower()
-    print(foo   )
     try:
         category = Category.objects.get(name=foo)
-       
+
         products = Product.objects.filter(category=category)
         return render(
             request, "Index/category.html", {"products": products, "category": category}
@@ -123,3 +122,54 @@ def Category_view(request, foo: str):
     except:
         messages.error(request, "This category does not exist... ")
         return redirect("home_page")
+
+
+@login_required(login_url="/store/login/")
+def add_to_cart(request, pk):
+    product = Product.objects.get(pk=pk)
+    user = request.user
+
+    try:
+        customer = Customer.objects.filter(email=user.email).first()
+    except Customer.DoesNotExist:
+        messages.error(request, "Customer profile not found.")
+        return redirect("home_page")
+
+    cart, created = Cart.objects.get_or_create(customer=customer)
+
+    quantity = int(request.POST.get("quantity", 1))
+
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+    if created:
+        cart_item.quantity = quantity
+    else:
+        cart_item.quantity += quantity
+    cart_item.save()
+
+    messages.success(request, f"{product.name} added to cart.")
+    return redirect("Product_detail", pk=pk)
+
+
+
+@login_required(login_url="/store/login/")
+def cart_summary(request):
+    user = request.user
+
+    try:
+        customer = Customer.objects.filter(email=user.email).first()
+    except Customer.DoesNotExist:
+        messages.error(request, "Customer profile not found.")
+        return redirect("home_page")
+
+    try:
+        cart = Cart.objects.get(customer=customer)
+        items = cart.items.all()
+        total = cart.get_total_price()
+    except Cart.DoesNotExist:
+        items = []
+        total = 0
+
+    return render(request, "cart/cart_summary.html", {
+        "items": items,
+        "total": total,
+    })

@@ -20,6 +20,8 @@
     <link rel="stylesheet" href="{% static 'assets/css/lightbox.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
     
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
     <style>
         .AccountImage {
             width: 70px;
@@ -34,6 +36,8 @@
             font-size: large;
         }
     </style>
+
+
 </head>
 <body>
 
@@ -93,7 +97,19 @@
                             </ul>
                         </li>
 
-                        <li><a href="#explore">Explore</a></li>
+                        <li class="nav-item">
+                            <a href="{% url 'cart_summary' %}" class="btn btn-outline-dark position-relative ms-2">
+                                🛒 Cart
+                                {% if cart_items_count %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {{ cart_items_count }}
+                                        <span class="visually-hidden">cart items</span>
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </li>
+
+                        
                     </ul>
 
                     <a class="menu-trigger"><span>Menu</span></a>
