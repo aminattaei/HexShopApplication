@@ -2,7 +2,6 @@ from django import forms
 from .models import Contact, Comment, ShippingAddress
 
 
-
 class ContactForm(forms.ModelForm):
 
     class Meta:

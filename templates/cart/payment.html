@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %} Payment Operation {% endblock title %}
+
+{% block content %}
+<style>
+    .payment-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        background-color: #f2f4f7;
+        padding: 20px;
+    }
+
+    .gateway-box {
+        background-color: #ffffff;
+        padding: 30px 40px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 480px;
+        text-align: center;
+    }
+
+    .gateway-box h2 {
+        font-size: 24px;
+        margin-bottom: 16px;
+        color: #333;
+    }
+
+    .gateway-box p {
+        margin: 8px 0;
+        font-size: 16px;
+        color: #555;
+    }
+
+    .amount {
+        font-size: 26px;
+        margin: 20px 0;
+        font-weight: bold;
+        color: #28a745;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .confirm-btn {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .confirm-btn:hover {
+        background-color: #218838;
+    }
+
+    .cancel-btn {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+    .cancel-btn:hover {
+        background-color: #c82333;
+    }
+</style>
+
+<div class="payment-wrapper">
+    <div class="gateway-box">
+        <h2>Simulated Payment Page</h2>
+        <p><strong>Order Number:</strong> #{{ order.id }}</p>
+        <p><strong>Customer:</strong> {{ order.customer.first_name }}</p>
+        <div class="amount">Total: ${{ order.get_total_price }}</div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="button-group">
+                <button type="submit" name="confirm" class="confirm-btn">Confirm Payment</button>
+                <button type="submit" name="cancel" class="cancel-btn">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

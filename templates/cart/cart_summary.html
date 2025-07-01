@@ -3,6 +3,23 @@
 
 {% block content %}
 <br><br><br>
+<style>
+    .shipping-info{
+        border:5px solid grey ;
+        font-size: 20px;
+        background-color: gray;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 50px;
+        
+    }
+
+    .shipping-info:hover{
+        background-color: red;
+        font-size: 25px;
+    }
+</style>
 
 <div class="container mt-5">
     <h2 class="mb-4">🛒 Your Shopping Cart</h2>
@@ -51,17 +68,9 @@
                 </tr>
             </tbody>
         </table>
-        <form action="{% url "shipping-info" %}" method='POST'>
-            {% csrf_token %}
-            <input type="text" name="country" placeholder="Enter Your Country">
-            <input type="text" name="city"    placeholder="Enter Your City">
-            <input type="text" name="address"    placeholder="Enter Your Address">
-            <input type="number" name="zipcode"    placeholder="Enter Your Zipcode">
+        <br><br>
 
-            <button type="submit" class="btn btn-secondary">Go To Payment</button>
-
-        </form>
-
+        <a class="shipping-info" href="{% url "shipping-info" %}">Go To Complete Shipping Information</a>
     {% else %}
         <div class="alert alert-warning" role="alert">
             Your cart is currently empty.

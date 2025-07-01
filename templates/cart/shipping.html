@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Shipping Information{% endblock title %}
+
+
+{% block content %}
+
+            <h1 style="text-align:center;">Shipping Information</h1>
+
+            <form action="{% url "shipping-info" %}" method='POST'>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="country">Country</label>
+                <input type="text" class="form-control" id="country" placeholder="Enter Country" name="country">
+            </div>
+
+            <br>
+
+            <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" class="form-control" id="city"  placeholder="Enter City" name='city'>
+            </div>
+
+            <br>
+
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" class="form-control" id="address" placeholder="Enter address" name="address">
+            </div>
+
+            <br>
+
+            <div class="form-group">
+                <label for="zipcode">Zipcode</label>    
+                <input type="number" class="form-control" id="zipcode" placeholder="Enter zipcode" name="zipcode">
+            </div>
+
+            <br>
+
+            <button style="width:100%;font-size:20px;margin-top:10px;" type="submit" class="btn btn-primary">Go to Payment</button>
+        </form>
+
+            
+{% endblock content %}

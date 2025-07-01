@@ -80,6 +80,7 @@ class Order(models.Model):
     phone = models.CharField(max_length=11, blank=True)
     date = models.DateField(default=datetime.today)
     status = models.BooleanField(default=False)
+    shipped_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name = _("order")
@@ -91,8 +92,9 @@ class Order(models.Model):
     def get_total_price(self):
         return sum(item.get_total_price() for item in self.items.all())
 
+
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 
@@ -101,7 +103,6 @@ class OrderItem(models.Model):
 
     def get_total_price(self):
         return self.product.price * self.quantity
-
 
 
 class Contact(models.Model):
@@ -124,6 +125,7 @@ class Cart(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+
     def __str__(self):
         return f"Cart #{self.id} - Customer: {self.customer.first_name}"
 
@@ -168,11 +170,7 @@ class ShippingAddress(models.Model):
     city = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     zipcode = models.IntegerField()
-    date_added = models.DateTimeField(auto_now=False, auto_now_add=True)
-
-    class Meta:
-        verbose_name = _("ShippingAddress")
-        verbose_name_plural = _("ShippingAddresses")
+    date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.address}, {self.city}"

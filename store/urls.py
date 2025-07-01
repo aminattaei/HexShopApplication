@@ -28,7 +28,8 @@ urlpatterns = [
     path("products/<int:pk>/", views.product_details, name="Product_detail"),
     path("products/<int:pk>/delete/", views.delete_cart_item, name="cart_item_delete"),
     path("products/<int:pk>/update/", views.update_cart_item, name="Update_cart_item"),
-    path('shipping/',views.shipping_view,name='shipping-info'),
+    path("payment/<int:order_id>/", views.payment_view, name="payment"),
+    path("shipping/", views.shipping_view, name="shipping-info"),
     # <---END BASE URLS AREA --->
     # <---START OPERATION URLS --->
     path("register/", views.register_view, name="register"),

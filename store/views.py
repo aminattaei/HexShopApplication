@@ -8,7 +8,16 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpRequest
 
 from .forms import ContactForm, CommentForm, ShippingAddressForm
-from .models import Product, Category, Cart, CartItem, Customer, Comment, Order
+from .models import (
+    Product,
+    Category,
+    Cart,
+    CartItem,
+    Customer,
+    Comment,
+    Order,
+    OrderItem,
+)
 from .serializers import ProductSerializer
 
 from rest_framework.viewsets import ModelViewSet
@@ -88,7 +97,6 @@ def register_view(request):
                 first_name=user.username,
                 email=user.email,
             )
-            print(user)
             login(request, user)
             messages.success(request, "Your account was successfully created!")
             return redirect("home_page")
@@ -318,26 +326,56 @@ def shipping_view(request):
     if request.method == "POST":
         form = ShippingAddressForm(request.POST)
         if form.is_valid():
-            queryset = form.save(commit=False)
             customer = Customer.objects.filter(email=request.user.email).first()
             if not customer:
                 messages.error(request, "Customer profile not found.")
                 return redirect("home_page")
 
             cart = Cart.objects.filter(customer=customer).first()
-            if not cart:
-                messages.error(request, "Shopping cart not found.")
-                return redirect("home_page")
+            if not cart or not cart.items.exists():
+                messages.error(request, "Shopping cart is empty or not found.")
+                return redirect("cart")
 
-            queryset.customer = customer
-            queryset.order = Order.objects.get(customer=customer)
-            queryset.save()
+            shipping = form.save(commit=False)
+            shipping.customer = customer
+
+            order = Order.objects.create(
+                customer=customer,
+                address=shipping.address,
+                phone=customer.phone,
+                status=False,
+            )
+
+            for item in cart.items.all():
+                OrderItem.objects.create(
+                    order=order, product=item.product, quantity=item.quantity
+                )
+
+            shipping.order = order
+            shipping.save()
+
+            cart.items.all().delete()
+
+            return redirect("payment", order_id=order.id)
         else:
-            messages.error(request, "Form not valid please check fields")
-            return redirect("home_page")
+            messages.error(request, "Form is not valid. Please check the fields.")
     else:
         form = ShippingAddressForm()
-    
-    cart.delete()
-    messages.success(request, "Shipping information saved. Your shopping cart will be delivered to you soon.")
-    return redirect("home_page")
+
+    return render(request, "cart/shipping.html", {"form": form})
+
+
+@login_required(login_url="/store/login/")
+def payment_view(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == "POST":
+        if "confirm" in request.POST:
+            order.status = True
+            order.save()
+            messages.success(request, "Payment completed successfully ✅")
+            return redirect("home_page")
+        elif "cancel" in request.POST:
+            messages.warning(request, "Payment cancelled ❌")
+            return redirect("cart_summary")
+    return render(request, "cart/payment.html", {"order": order})
