@@ -13,5 +13,7 @@ urlpatterns = [
     path("logout/", views.logout_user, name="logout"),
     path("category/<str:foo>/", views.Category_view, name="category_page"),
     path("add-to-cart/<int:pk>/", views.add_to_cart, name="add_to_cart"),
-    path('cart/',views.cart_summary,name='cart_summary')
+    path("cart/", views.cart_summary, name="cart_summary"),
+    path("submit-comment/<int:pk>/",views.submit_comment_view, name="submit_comment")
+
 ]

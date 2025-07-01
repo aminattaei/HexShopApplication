@@ -116,7 +116,6 @@ class Contact(models.Model):
         return reverse("Contact_detail", kwargs={"pk": self.pk})
 
 
-
 class Cart(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -129,7 +128,7 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 
@@ -138,3 +137,18 @@ class CartItem(models.Model):
 
     def get_total_price(self):
         return self.product.price * self.quantity
+
+
+
+class Comment(models.Model):
+    product = models.ForeignKey(Product, verbose_name=_("product"), on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, verbose_name=_("customer"), on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at=models.DateTimeField(auto_now=False, auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Comment")
+        verbose_name_plural = _("Comments")
+
+    def __str__(self):
+        return f"Comment by {self.customer} on {self.product}"

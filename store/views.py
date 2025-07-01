@@ -1,28 +1,36 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.urls import reverse
 from django.views import generic
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
 
-from .forms import ContactForm
-from .models import Product, Category,Cart,CartItem,Customer
+from .forms import ContactForm,CommentForm
+from .models import Product, Category, Cart, CartItem, Customer,Comment
 
 
 def Home_Page(request):
-    MensCategory = Category.objects.get(name='men')
-    WomensCategory = Category.objects.get(name='women')
-    KidssCategory = Category.objects.get(name='kids')
+    MensCategory = Category.objects.get(name="men")
+    WomensCategory = Category.objects.get(name="women")
+    KidssCategory = Category.objects.get(name="kids")
 
     mensProduct = Product.objects.filter(category=MensCategory)
-    womensProduct=Product.objects.filter(category=WomensCategory)
-    kidsProduct=Product.objects.filter(category=KidssCategory)
+    womensProduct = Product.objects.filter(category=WomensCategory)
+    kidsProduct = Product.objects.filter(category=KidssCategory)
 
-    return render(request, "Index/index.html",{'mensProduct':mensProduct,'womensProduct':womensProduct,'kidsProduct':kidsProduct})
+    return render(
+        request,
+        "Index/index.html",
+        {
+            "mensProduct": mensProduct,
+            "womensProduct": womensProduct,
+            "kidsProduct": kidsProduct,
+        },
+    )
+
 
 def about_page(request):
     return render(request, "Index/about.html", {})
@@ -40,8 +48,9 @@ class product_page(generic.ListView):
 
 def product_details(request, pk):
     product = Product.objects.get(id=pk)
+    comments = Comment.objects.filter(product=product).order_by('-created_at')
 
-    context = {"product": product}
+    context = {"product": product,'comments':comments}
 
     return render(request, "Index/single-product.html", context)
 
@@ -86,7 +95,7 @@ def login_user(request):
     else:
         return render(request, "registration/login.html", {})
 
-
+# This Function is Not Ready...!!!
 def Contact_View(request):
     if request.method == "POST":
         form = ContactForm(request.POST)
@@ -150,7 +159,6 @@ def add_to_cart(request, pk):
     return redirect("Product_detail", pk=pk)
 
 
-
 @login_required(login_url="/store/login/")
 def cart_summary(request):
     user = request.user
@@ -169,7 +177,40 @@ def cart_summary(request):
         items = []
         total = 0
 
-    return render(request, "cart/cart_summary.html", {
-        "items": items,
-        "total": total,
-    })
+    return render(
+        request,
+        "cart/cart_summary.html",
+        {
+            "items": items,
+            "total": total,
+        },
+    )
+
+@login_required(login_url="/store/login/")
+def submit_comment_view(request, pk):
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+
+        if form.is_valid():
+            product = get_object_or_404(Product, pk=pk)
+            customer = Customer.objects.filter(email=request.user.email).first()
+
+            if not customer:
+                messages.error(request, "Customer profile not found.")
+                return redirect('home_page')
+
+            comment = form.save(commit=False)
+            comment.product = product
+            comment.customer = customer
+            comment.save()
+
+            messages.success(request, "Your comment was successfully submitted.")
+            return redirect('Product_detail', pk=pk)
+
+        else:
+            messages.error(request, "There was a problem submitting your comment. Please try again.")
+            return redirect('Product_detail', pk=pk)
+
+    return redirect('home_page')
+
+

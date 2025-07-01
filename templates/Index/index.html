@@ -170,13 +170,13 @@
                                                     <ul>
                                                         <li><a href="{% url 'Product_detail' men.id %}"><i class="fa fa-eye"></i></a></li>
                                                         <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                        <li><a href="#"><i class="fa fa-shopping-cart"></i></a></li>
+                                                        <li><a href="{% url 'add_to_cart' men.pk %}"><i class="fa fa-shopping-cart"></i></a></li>
                                                     </ul>
                                                 </div>
                                                 <img class="image-category" src="{{ men.image.url }}" alt="{{ men.name }}">
                                             </div>
                                             <div class="down-content">
-                                                <h4>{{ men.name }}</h4>
+                                                <h4><a href="{% url 'Product_detail' men.id %}">{{ men.name }}</a></h4>
                                                 {% if men.is_sale %}
                                                     <del>${{ men.price }}</del> &nbsp; <strong>${{ men.sale_price }}</strong>
                                                 {% else %}
@@ -220,18 +220,21 @@
 
                             {% for women in womensProduct %}
                                 <div class="item">
-                                    <div class="thumb">
+                                    <div class="thumb" style="position: relative;">
+                                        {% if women.is_sale %}
+                                            <div class="sale-badge">SALE!</div>
+                                        {% endif %}
                                         <div class="hover-content">
                                             <ul>
                                                 <li><a href="{% url 'Product_detail' women.id %}"><i class="fa fa-eye"></i></a></li>
                                                 <li><a href="{% url "Product_detail" women.id  %}"><i class="fa fa-star"></i></a></li>
-                                                <li><a href="{% url "Product_detail" women.id  %}"><i class="fa fa-shopping-cart"></i></a></li>
+                                                <li><a href="{% url 'add_to_cart' women.pk %}"><i class="fa fa-shopping-cart"></i></a></li>
                                             </ul>
                                         </div>
                                         <img class='image-category' src="{{ women.image.url }}" alt="">
                                     </div>
                                     <div class="down-content">
-                                        <h4>{{ women.name }}</h4>
+                                        <h4><a href="{% url 'Product_detail' women.id %}">{{ women.name }}</a></h4>
                                         
                                         {% if women.is_sale %}
                                             <del>${{ women.price }}</del> &nbsp; <strong>{{ women.sale_price }}</strong>
@@ -276,20 +279,24 @@
 
                             {% for kid in kidsProduct %}
                                 <div class="item">
-                                    <div class="thumb">
+                                    <div class="thumb" style="position: relative;">
+                                        {% if kid.is_sale %}
+                                            <div class="sale-badge">SALE!</div>
+                                        {% endif %}
                                         <div class="hover-content">
                                             <ul>
                                                 <li><a href="{% url "Product_detail" kid.id  %}"><i class="fa fa-eye"></i></a></li>
                                                 <li><a href="{% url "Product_detail" kid.id %}"><i class="fa fa-star"></i></a></li>
-                                                <li><a href="{% url "Product_detail" kid.id %}"><i class="fa fa-shopping-cart"></i></a></li>
+                                                <li><a href="{% url 'add_to_cart' kid.pk %}"><i class="fa fa-shopping-cart"></i></a></li>
                                             </ul>
                                         </div>
                                         <img class='image-category' src="{{ kid.image.url }}" alt="{{ kid.name }}">
                                     </div>
                                 <div class="down-content">
-                                    <h4>{{ kid.name }}</h4>
+                                    <h4><a href="{% url "Product_detail" kid.id  %}">{{ kid.name }}</a></h4>
 
-                                    {% if women.is_sale %}
+                                    {% if kid.is_sale %}
+                                        
                                         <del>${{ kid.price }}</del> &nbsp; <strong>{{ kid.sale_price }}<strong>
                                     {% else %}
                                         <span>${{ kid.price }}</span>
