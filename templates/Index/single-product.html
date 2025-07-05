@@ -32,6 +32,25 @@
     border-radius: 10px;
     }
 
+    .image-category{
+        width:600px;
+        height:300px;
+    }
+
+        .sale-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px; 
+        background-color: red;
+        color: white;
+        padding: 6px 14px;
+        font-weight: bold;
+        font-size: 18px;
+        font-style: italic;
+        border-radius: 6px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        z-index: 10;
+        }
 </style>
 
 
@@ -102,6 +121,55 @@
                 </div>
             </section>
             
+
+
+<!-- ***** Related Products Section ***** -->
+<section class="container py-5"> <!-- فاصله بالا و پایین -->
+    <h4 class="mb-3">You might also like...</h4>
+
+    <div class="row g-4">
+        {% for product in Related_Products %}
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 position-relative">
+                {% if product.is_sale %}
+                <div class="sale-badge">SALE!</div>
+                {% endif %}
+                <a href="{% url 'Product_detail' product.id %}">
+                    <img src="{{ product.image.url }}" class="card-img-top related-product-img" alt="{{ product.name }}">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'Product_detail' product.id %}" class="text-dark text-decoration-none">
+                            {{ product.name }}
+                        </a>
+                    </h5>
+                    <p class="card-text">
+                        {% if product.is_sale %}
+                            <del class="text-muted">${{ product.price }}</del>
+                            <span class="text-danger fw-bold ms-2">${{ product.sale_price }}</span>
+                        {% else %}
+                            <span class="fw-bold">${{ product.price }}</span>
+                        {% endif %}
+                    </p>
+                    <div class="d-flex justify-content-between mt-3">
+                        <a href="{% url 'add_to_cart' product.pk %}" class="btn btn-sm btn-dark">
+                            <i class="fa fa-shopping-cart me-1"></i> Add To Cart
+                        </a>
+                        <a href="{% url 'Product_detail' product.id %}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+<!-- ***** End Related Products Section ***** -->
+
+
+
+
             <!-- ***** Comment Section Starts ***** -->
             <div class="container mt-5">
             <div class="comment-section">

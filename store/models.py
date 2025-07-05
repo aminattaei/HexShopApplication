@@ -139,12 +139,15 @@ class CartItem(models.Model):
         return self.product.price * self.quantity
 
 
-
 class Comment(models.Model):
-    product = models.ForeignKey(Product, verbose_name=_("product"), on_delete=models.CASCADE)
-    customer = models.ForeignKey(Customer, verbose_name=_("customer"), on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Product, verbose_name=_("product"), on_delete=models.CASCADE
+    )
+    customer = models.ForeignKey(
+        Customer, verbose_name=_("customer"), on_delete=models.CASCADE
+    )
     text = models.TextField()
-    created_at=models.DateTimeField(auto_now=False, auto_now_add=True)
+    created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
 
     class Meta:
         verbose_name = _("Comment")

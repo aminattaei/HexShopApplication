@@ -1,5 +1,6 @@
 from .models import Cart, Customer
 
+
 def cart_items_count(request):
     count = 0
     if request.user.is_authenticated:
@@ -11,4 +12,4 @@ def cart_items_count(request):
                     count = cart.items.count()
         except:
             count = 0
-    return {'cart_items_count': count}
+    return {"cart_items_count": count}
