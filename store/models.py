@@ -94,7 +94,7 @@ class Order(models.Model):
         verbose_name_plural = _("orders")
 
     def __str__(self):
-        return f"product: {self.product}"
+        return f"Order #{ self.id } by { self.customer.first_name }"
 
     def get_absolute_url(self):
         return reverse("Category_detail", kwargs={"pk": self.pk})
@@ -155,3 +155,19 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.customer} on {self.product}"
+
+
+class ShippingAddress(models.Model):
+    customer = models.ForeignKey(Customer,on_delete=models.CASCADE)
+    order = models.ForeignKey(Order,on_delete=models.CASCADE)
+    country = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    zipcode = models.IntegerField()
+    date_added = models.DateTimeField(auto_now=False, auto_now_add=True)
+    class Meta:
+        verbose_name = _("ShippingAddress")
+        verbose_name_plural = _("ShippingAddresses")
+
+    def __str__(self):
+        return F"{self.address}, {self.city}"

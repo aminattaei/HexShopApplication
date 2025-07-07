@@ -5,19 +5,22 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse,HttpRequest
+from django.http import HttpResponse, HttpRequest
 
 from .forms import ContactForm, CommentForm
 from .models import Product, Category, Cart, CartItem, Customer, Comment
 from .serializers import ProductSerializer
 
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.response import Response
+
+from decimal import Decimal
+
 
 
 class ProductListAPI(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
 
 
 def Home_Page(request):
@@ -49,12 +52,9 @@ def contact_page(request):
     return render(request, "Index/contact.html")
 
 
-class ProductListView(generic.ListView):
-    """Display all products."""
-
-    template_name = "Index/products.html"
-    model = Product
-    context_object_name = "products"
+def product_list(request):
+    products = Product.objects.all()
+    return render(request,"Index/products.html",{'products':products})
 
 
 def product_details(request, pk):
@@ -207,6 +207,46 @@ def delete_cart_item(request: HttpRequest, pk: int) -> HttpResponse:
     messages.success(request, f"{ product.name } successfully removed from your cart.")
     return redirect("cart_summary")
 
+
+@login_required(login_url="/store/login/")
+def update_cart_item(request: HttpRequest, pk: int) -> HttpResponse:
+    """
+    Updates a specific product from the authenticated user's shopping cart.
+    """
+
+    product = get_object_or_404(Product, pk=pk)
+    customer = Customer.objects.filter(email=request.user.email).first()
+
+    if not customer:
+        messages.error(request, "Customer not found.")
+        return redirect("home_page")
+
+    cart = Cart.objects.filter(customer=customer).first()
+    if not cart:
+        messages.error(request, "Shopping cart not found.")
+        return redirect("home_page")
+
+    cart_item = CartItem.objects.filter(cart=cart, product=product).first()
+    if not cart_item:
+        messages.error(request, "Item not found in your cart.")
+        return redirect("home_page")
+
+    try:
+        new_quantity = int(request.POST.get("new_quantity"))
+    except (TypeError, ValueError):
+        messages.error(request, "Invalid quantity value.")
+        return redirect("Product_detail", pk=pk)
+
+    if cart_item.quantity != new_quantity:
+        cart_item.quantity = new_quantity
+        cart_item.save()
+        messages.success(request, "Cart item updated successfully.")
+    else:
+        messages.info(request, "Quantity is already up to date.")
+
+    return redirect("Product_detail", pk=pk)
+
+
 @login_required(login_url="/store/login/")
 def cart_summary(request):
     """
@@ -218,10 +258,31 @@ def cart_summary(request):
         return redirect("home_page")
 
     cart = Cart.objects.filter(customer=customer).first()
-    items = cart.items.all() if cart else []
-    total = cart.get_total_price() if cart else 0
 
-    return render(request, "cart/cart_summary.html", {"items": items, "total": total})
+    if cart:
+        items = cart.items.all()
+        total = cart.get_total_price()
+        tax = round(total * Decimal("0.09"), 2)
+        shipping = Decimal("5.00")
+        grand_total = total + tax + shipping
+    else:
+        items = []
+        total = Decimal("0.00")
+        tax = Decimal("0.00")
+        shipping = Decimal("0.00")
+        grand_total = Decimal("0.00")
+
+    return render(
+        request,
+        "cart/cart_summary.html",
+        {
+            "items": items,
+            "total": total,
+            "tax": tax,
+            "shipping": shipping,
+            "grand_total": grand_total,
+        },
+    )
 
 
 @login_required(login_url="/store/login/")
@@ -250,5 +311,3 @@ def submit_comment_view(request, pk):
         return redirect("Product_detail", pk=pk)
 
     return redirect("home_page")
-
-
