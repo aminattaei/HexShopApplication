@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.text import slugify
 from django.urls import reverse
 from datetime import datetime
 
@@ -7,7 +8,8 @@ from datetime import datetime
 class Category(models.Model):
     name = models.CharField(_("category name"), max_length=50)
 
-    description = models.TextField(default="", blank=True,null=True)
+    description = models.TextField(default="", blank=True, null=True)
+    slug = models.SlugField(unique=True, max_length=255, blank=True)
 
     class Meta:
         verbose_name = _("category")
@@ -46,7 +48,7 @@ class Product(models.Model):
     name = models.CharField(_("product name"), max_length=50)
 
     price = models.DecimalField(
-        _("peoduct price "), max_digits=6, decimal_places=2, default=0
+        _("product price "), max_digits=6, decimal_places=2, default=0
     )
 
     category = models.ForeignKey("Category", on_delete=models.CASCADE)
@@ -58,7 +60,7 @@ class Product(models.Model):
     is_sale = models.BooleanField(default=False)
 
     sale_price = models.DecimalField(
-        _("peoduct price "), max_digits=6, decimal_places=2, default=0, blank=True
+        _("product price "), max_digits=6, decimal_places=2, default=0, blank=True
     )
 
     class Meta:
@@ -73,18 +75,10 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-
-    quantity = models.IntegerField()
-
     address = models.TextField()
-
     phone = models.CharField(max_length=11, blank=True)
-
     date = models.DateField(default=datetime.today)
-
     status = models.BooleanField(default=False)
 
     class Meta:
@@ -92,10 +86,22 @@ class Order(models.Model):
         verbose_name_plural = _("orders")
 
     def __str__(self):
-        return f"product: {self.product}"
+        return f"Order #{self.id} by {self.customer.first_name}"
 
-    def get_absolute_url(self):
-        return reverse("Category_detail", kwargs={"pk": self.pk})
+    def get_total_price(self):
+        return sum(item.get_total_price() for item in self.items.all())
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
+
+    def get_total_price(self):
+        return self.product.price * self.quantity
+
 
 
 class Contact(models.Model):
@@ -112,3 +118,61 @@ class Contact(models.Model):
 
     def get_absolute_url(self):
         return reverse("Contact_detail", kwargs={"pk": self.pk})
+
+
+class Cart(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    def __str__(self):
+        return f"Cart #{self.id} - Customer: {self.customer.first_name}"
+
+    def get_total_price(self):
+        return sum(item.get_total_price() for item in self.items.all())
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
+
+    def get_total_price(self):
+        return self.product.price * self.quantity
+
+
+class Comment(models.Model):
+    product = models.ForeignKey(
+        Product, verbose_name=_("product"), on_delete=models.CASCADE
+    )
+    customer = models.ForeignKey(
+        Customer, verbose_name=_("customer"), on_delete=models.CASCADE
+    )
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Comment")
+        verbose_name_plural = _("Comments")
+
+    def __str__(self):
+        return f"Comment by {self.customer} on {self.product}"
+
+
+class ShippingAddress(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    country = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    zipcode = models.IntegerField()
+    date_added = models.DateTimeField(auto_now=False, auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("ShippingAddress")
+        verbose_name_plural = _("ShippingAddresses")
+
+    def __str__(self):
+        return f"{self.address}, {self.city}"

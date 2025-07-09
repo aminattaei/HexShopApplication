@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Your Cart{% endblock title %}
+
+{% block content %}
+<br><br><br>
+
+<div class="container mt-5">
+    <h2 class="mb-4">🛒 Your Shopping Cart</h2>
+
+    {% if items %}
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Actions</th>
+                    <th>Product</th>
+                    <th style="width: 160px;">Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <!-- Delete button -->
+                        <a href="{% url 'cart_item_delete' item.product.pk %}"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Are you sure you want to remove {{ item.product.name }} from your cart?');">
+                           🗑 Delete
+                        </a>
+                    </td>
+
+                    <td>{{ item.product.name }}</td>
+
+                    <!-- Quantity update form -->
+                    <td>
+                        <form method="post" action="{% url 'Update_cart_item' item.product.pk %}" class="d-flex gap-2">
+                            {% csrf_token %}
+                            <input type="number" name="new_quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm" style="width: 70px;">
+                            <button type="submit" class="btn btn-sm btn-primary">🔄</button>
+                        </form>
+                    </td>
+
+                    <td>${{ item.product.price }}</td>
+                    <td>${{ item.get_total_price }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="table-info">
+                    <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                    <td><strong>${{ total }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <form action="{% url "shipping-info" %}" method='POST'>
+            {% csrf_token %}
+            <input type="text" name="country" placeholder="Enter Your Country">
+            <input type="text" name="city"    placeholder="Enter Your City">
+            <input type="text" name="address"    placeholder="Enter Your Address">
+            <input type="number" name="zipcode"    placeholder="Enter Your Zipcode">
+
+            <button type="submit" class="btn btn-secondary">Go To Payment</button>
+
+        </form>
+
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            Your cart is currently empty.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -62,59 +62,39 @@
             <div class="row">
 
                 {% for product in products %}
-                    {% if product.is_sale %}
                         <div class="col-lg-4">
                             <div class="item">
                                 <div class="thumb">
                                     <div class="hover-content">
                                         <ul>
-                                            <li><a href="{% static 'single-product.html' %}"><i class="fa fa-eye"></i></a></li>
-                                            <li><a href="{% static 'single-product.html' %}"><i class="fa fa-star"></i></a></li>
-                                            <li><a href="{% static 'single-product.html' %}"><i class="fa fa-shopping-cart"></i></a></li>
+                                            <li><a href=" {% url "Product_detail" product.id  %} "><i class="fa fa-eye"></i></a></li>
+                                            <li><a href="{% url 'add_to_cart' product.pk %}"><i class="fa fa-shopping-cart"></i></a></li>
                                         </ul>
                                     </div>
-                                    <div class="sale-badge">SALE!</div>
+                                    {% if product.is_sale %}
+                                        <div class="sale-badge">SALE!</div>
+                                    {% endif %}                                    
                                     <img id="PictureImage" src="{{ product.image.url }}" alt="{{ product.name }}">
                                 </div>
                                 <div class="down-content">
                                     <a href="{{ product.get_absolute_url }}"><h4>{{ product.name  }}</h4></a>
-                                    <del>$ {{ product.price }}</del>
-                                    &nbsp; <strong>$ {{ product.sale_price }}</strong>
-                                    <ul class="stars">
 
-                                        <li>{{ product.category }}</li>
-                                        
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                                    {% if product.is_sale %}
+                                        <del>$ {{ product.price }}</del>
+                                        &nbsp; <strong>$ {{ product.sale_price }}</strong>
+                                    {% else %}
+                                        <strong>$ {{ product.price }} </strong>
+                                        <ul class="stars">
 
-                    {% else %}
-
-                         <div class="col-lg-4">
-                            <div class="item">
-                                <div class="thumb">
-                                    <div class="hover-content">
-                                        <ul>
-                                            <li><a href="{% static 'single-product.html' %}"><i class="fa fa-eye"></i></a></li>
-                                            <li><a href="{% static 'single-product.html' %}"><i class="fa fa-star"></i></a></li>
-                                            <li><a href="{% static 'single-product.html' %}"><i class="fa fa-shopping-cart"></i></a></li>
+                                            <li>{{ product.category }}</li>
+                                            
                                         </ul>
-                                    </div>
-                                    <img id="PictureImage" src="{{ product.image.url }}" alt="{{ product.name }}">
-                                </div>
-                                <div class="down-content">
-                                    <a href="{{ product.get_absolute_url }}"><h4>{{ product.name  }}</h4></a>
-                                    <span>${{ product.price }}</span>
-                                    <ul class="stars">
+                                    {% endif %}
 
-                                        <li>{{ product.category }}</li>
-                                        
-                                    </ul>
                                 </div>
                             </div>
                         </div>
-                    {% endif %}
+
                 {% endfor %}
                 
 

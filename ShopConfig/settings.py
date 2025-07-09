@@ -25,6 +25,10 @@ INSTALLED_APPS = [
     "store",
     "crispy_forms",
     "crispy_bootstrap5",
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -54,6 +58,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "store.context_processors.cart_items_count",
             ],
         },
     },
@@ -92,6 +97,29 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# REST_FRAMEWORK = {
+#     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+#     "DEFAULT_AUTHENTICATION_CLASSES": (
+#         "rest_framework_simplejwt.authentication.JWTAuthentication",
+#     ),
+#     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+#     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+#     "PAGE_SIZE": 10,
+# }
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "HexaShop WebStore API",
+    "DESCRIPTION": "This api fetch product of hexashop.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
+
+
+SPECTACULAR_SETTINGS = {
+    "SWAGGER_UI_DIST": "SIDECAR",  # shorthand to use the sidecar instead
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
+}
 
 # Internationalization
 
