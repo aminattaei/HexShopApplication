@@ -7,8 +7,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpRequest
 
-from .forms import ContactForm, CommentForm
-from .models import Product, Category, Cart, CartItem, Customer, Comment
+from .forms import ContactForm, CommentForm, ShippingAddressForm
+from .models import Product, Category, Cart, CartItem, Customer, Comment, Order
 from .serializers import ProductSerializer
 
 from rest_framework.viewsets import ModelViewSet
@@ -16,11 +16,9 @@ from rest_framework.viewsets import ModelViewSet
 from decimal import Decimal
 
 
-
 class ProductListAPI(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
 
 
 def Home_Page(request):
@@ -54,7 +52,7 @@ def contact_page(request):
 
 def product_list(request):
     products = Product.objects.all()
-    return render(request,"Index/products.html",{'products':products})
+    return render(request, "Index/products.html", {"products": products})
 
 
 def product_details(request, pk):
@@ -90,6 +88,7 @@ def register_view(request):
                 first_name=user.username,
                 email=user.email,
             )
+            print(user)
             login(request, user)
             messages.success(request, "Your account was successfully created!")
             return redirect("home_page")
@@ -179,6 +178,7 @@ def add_to_cart(request, pk):
 
     messages.success(request, f"{product.name} added to cart.")
     return redirect("Product_detail", pk=pk)
+
 
 @login_required(login_url="/store/login/")
 def delete_cart_item(request: HttpRequest, pk: int) -> HttpResponse:
@@ -310,4 +310,34 @@ def submit_comment_view(request, pk):
         messages.error(request, "There was a problem submitting your comment.")
         return redirect("Product_detail", pk=pk)
 
+    return redirect("home_page")
+
+
+@login_required(login_url="/store/login/")
+def shipping_view(request):
+    if request.method == "POST":
+        form = ShippingAddressForm(request.POST)
+        if form.is_valid():
+            queryset = form.save(commit=False)
+            customer = Customer.objects.filter(email=request.user.email).first()
+            if not customer:
+                messages.error(request, "Customer profile not found.")
+                return redirect("home_page")
+
+            cart = Cart.objects.filter(customer=customer).first()
+            if not cart:
+                messages.error(request, "Shopping cart not found.")
+                return redirect("home_page")
+
+            queryset.customer = customer
+            queryset.order = Order.objects.get(customer=customer)
+            queryset.save()
+        else:
+            messages.error(request, "Form not valid please check fields")
+            return redirect("home_page")
+    else:
+        form = ShippingAddressForm()
+    
+    cart.delete()
+    messages.success(request, "Shipping information saved. Your shopping cart will be delivered to you soon.")
     return redirect("home_page")

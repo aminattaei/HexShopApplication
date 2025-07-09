@@ -1,5 +1,13 @@
 from django.contrib import admin
-from .models import Category, Customer, Product, Order, Contact, Comment,ShippingAddress
+from .models import (
+    Category,
+    Customer,
+    Product,
+    Order,
+    Contact,
+    Comment,
+    ShippingAddress,
+)
 
 
 admin.site.register(Category)

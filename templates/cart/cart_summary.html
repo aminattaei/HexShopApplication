@@ -51,6 +51,17 @@
                 </tr>
             </tbody>
         </table>
+        <form action="{% url "shipping-info" %}" method='POST'>
+            {% csrf_token %}
+            <input type="text" name="country" placeholder="Enter Your Country">
+            <input type="text" name="city"    placeholder="Enter Your City">
+            <input type="text" name="address"    placeholder="Enter Your Address">
+            <input type="number" name="zipcode"    placeholder="Enter Your Zipcode">
+
+            <button type="submit" class="btn btn-secondary">Go To Payment</button>
+
+        </form>
+
     {% else %}
         <div class="alert alert-warning" role="alert">
             Your cart is currently empty.

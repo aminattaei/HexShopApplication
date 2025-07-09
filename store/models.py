@@ -119,7 +119,7 @@ class Contact(models.Model):
 class Cart(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    is_active = models.BooleanField(default=True)
     def __str__(self):
         return f"Cart #{self.id} - Customer: {self.customer.first_name}"
 
@@ -158,16 +158,17 @@ class Comment(models.Model):
 
 
 class ShippingAddress(models.Model):
-    customer = models.ForeignKey(Customer,on_delete=models.CASCADE)
-    order = models.ForeignKey(Order,on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     country = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     zipcode = models.IntegerField()
     date_added = models.DateTimeField(auto_now=False, auto_now_add=True)
+
     class Meta:
         verbose_name = _("ShippingAddress")
         verbose_name_plural = _("ShippingAddresses")
 
     def __str__(self):
-        return F"{self.address}, {self.city}"
+        return f"{self.address}, {self.city}"

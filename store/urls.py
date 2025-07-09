@@ -28,8 +28,8 @@ urlpatterns = [
     path("products/<int:pk>/", views.product_details, name="Product_detail"),
     path("products/<int:pk>/delete/", views.delete_cart_item, name="cart_item_delete"),
     path("products/<int:pk>/update/", views.update_cart_item, name="Update_cart_item"),
+    path('shipping/',views.shipping_view,name='shipping-info'),
     # <---END BASE URLS AREA --->
-    
     # <---START OPERATION URLS --->
     path("register/", views.register_view, name="register"),
     path("login/", views.login_user, name="login"),
@@ -39,14 +39,12 @@ urlpatterns = [
     path("cart/", views.cart_summary, name="cart_summary"),
     path("submit-comment/<int:pk>/", views.submit_comment_view, name="submit_comment"),
     # <---END OPERATION URLS --->
-
     # <---START API URLS --->
     path("api/", include(router.urls)),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     # <---END API URLS --->
-
     # <---START API SCHEMA AREA--->
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
