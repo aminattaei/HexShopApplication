@@ -48,7 +48,7 @@ class Product(models.Model):
     name = models.CharField(_("product name"), max_length=50)
 
     price = models.DecimalField(
-        _("peoduct price "), max_digits=6, decimal_places=2, default=0
+        _("product price "), max_digits=6, decimal_places=2, default=0
     )
 
     category = models.ForeignKey("Category", on_delete=models.CASCADE)
@@ -75,18 +75,10 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-
-    quantity = models.IntegerField()
-
     address = models.TextField()
-
     phone = models.CharField(max_length=11, blank=True)
-
     date = models.DateField(default=datetime.today)
-
     status = models.BooleanField(default=False)
 
     class Meta:
@@ -94,10 +86,22 @@ class Order(models.Model):
         verbose_name_plural = _("orders")
 
     def __str__(self):
-        return f"Order #{ self.id } by { self.customer.first_name }"
+        return f"Order #{self.id} by {self.customer.first_name}"
 
-    def get_absolute_url(self):
-        return reverse("Category_detail", kwargs={"pk": self.pk})
+    def get_total_price(self):
+        return sum(item.get_total_price() for item in self.items.all())
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
+
+    def get_total_price(self):
+        return self.product.price * self.quantity
+
 
 
 class Contact(models.Model):
