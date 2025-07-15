@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,6 +30,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "drf_spectacular",
     "drf_spectacular_sidecar",
+    'modeltranslation',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -44,6 +46,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django.middleware.locale.LocaleMiddleware',
 ]
 
 ROOT_URLCONF = "ShopConfig.urls"
@@ -130,6 +133,24 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+
+
+
+LANGUAGES = (
+    ('en', 'English'),
+    ('fa', 'فارسی'),
+)
+
+LANGUAGE_CODE = 'en'  
+
+USE_I18N = True
+USE_L10N = True
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
+
 
 
 # Static files (CSS, JavaScript, Images)

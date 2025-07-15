@@ -323,6 +323,39 @@ def submit_comment_view(request, pk):
 
 @login_required(login_url="/store/login/")
 def shipping_view(request):
+
+    """
+    Handles the shipping address form submission and order creation process.
+
+    This view is responsible for processing the shipping address form submitted by a logged-in user.
+    It performs the following steps:
+
+    1. Validates the form data submitted via POST.
+    2. Retrieves the currently logged-in user's `Customer` profile.
+    3. Checks if the user's shopping cart exists and contains items.
+    4. Creates a new `Order` instance with the submitted shipping address and user's phone number.
+    5. Iterates over each item in the user's cart and creates corresponding `OrderItem` entries.
+    6. Assigns the newly created order to the shipping address instance and saves it.
+    7. Clears all items from the user's cart (emptying it).
+    8. Redirects the user to the payment page with the newly created order ID.
+
+    If the form is invalid or the cart is empty, appropriate error messages are shown to the user,
+    and they are redirected accordingly.
+
+    GET requests simply render the empty shipping form.
+
+    Access Control:
+    - This view is protected by login. Only authenticated users can access it.
+
+    Context:
+    - On GET: renders `cart/shipping.html` with an empty `ShippingAddressForm`.
+    - On POST (valid): redirects to "payment" view.
+    - On POST (invalid): re-renders form with error messages.
+
+    Raises:
+        Http404: if customer or cart not found (handled via error messages and redirects).
+    """
+
     if request.method == "POST":
         form = ShippingAddressForm(request.POST)
         if form.is_valid():
@@ -367,6 +400,43 @@ def shipping_view(request):
 
 @login_required(login_url="/store/login/")
 def payment_view(request, order_id):
+    """
+    Handles the confirmation or cancellation of an order payment.
+
+    This view allows an authenticated user to either confirm or cancel the payment of a specific order.
+    The `order_id` is used to retrieve the relevant `Order` object.
+
+    Functionality:
+    1. If the request method is POST:
+        - If the user clicks the "Confirm" button:
+            * The order's status is updated to True (indicating the order is paid).
+            * A success message is displayed.
+            * User is redirected to the home page.
+        - If the user clicks the "Cancel" button:
+            * The order remains unpaid.
+            * A warning message is displayed.
+            * User is redirected back to the cart summary page.
+
+    2. If the request method is GET:
+        - Renders the `cart/payment.html` template with the order details for user confirmation.
+
+    Access Control:
+    - Only authenticated users can access this view.
+
+    Arguments:
+    - request: HttpRequest object.
+    - order_id: ID of the order to be confirmed or canceled.
+
+    Context:
+    - 'order': The order object corresponding to the provided `order_id`.
+
+    Templates:
+    - cart/payment.html: Displayed to the user for confirming/canceling the payment.
+
+    Raises:
+    - Http404: If no Order object is found with the given `order_id`.
+    """
+
     order = get_object_or_404(Order, id=order_id)
 
     if request.method == "POST":
